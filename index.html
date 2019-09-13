@@ -25,7 +25,11 @@
 </head>
 
 <body>
-
+    <p>Count numbers:
+        <output id="result"></output>
+    </p>
+    <button onclick="startWorker()">Start Worker</button>
+    <button onclick="stopWorker()">Stop Worker</button>
     <div id="matrixHere"></div>
     <canvas id="myCanvas" width="1000" height="1000" style="border:1px solid #c3c3c3;">
         Your browser does not support the canvas element.
@@ -34,68 +38,104 @@
 
 </body>
 <script type="text/javascript">
-    //colors
-    var _seaColor = "#80b3ff";
-    var _fishColor = "#70db70";
-    var _sharkColor = "#ff3333";
+    var w;
 
-    var _sea = 0;
-    var _fish = 1;
-    var _shark = 2;
-
-    //size
-    var _gridUnit = 10;
-    var canvas = document.getElementById("myCanvas");
-    var ctx = canvas.getContext("2d");
-
-    var sea = [];
-
-
-
-    // ctx.fillStyle = "#FF0000";
-    // ctx.fillRect(0, 0, 150, 75);
-    // ctx.fillStyle = "#000000";
-    //ctx.fillRect(500, 500, 150, 150);
-    initSea();
-    // populateArea(50, 70, _fishColor);
-
-
-    function initSea() {
-        for (var i = 0; i < 100; i++) {
-            var row = [];
-            for (var y = 0; y < 100; y++) {
-                row.push(_sea);
-
-                //populateArea(y, i, _seaColor);
+    function startWorker() {
+        if (typeof (Worker) !== "undefined") {
+            if (typeof (w) == "undefined") {
+                w = new Worker("app/worker.js");
             }
-            sea.push(row);
+            w.onmessage = function (event) {
+                var color = event.color;
+                var x = event.x;
+                var y = event.y;
+                if (color === 0) {
+                    ctx.fillStyle = _seaColor;
+
+                } else if (color === 1) {
+                    ctx.fillStyle = _fishColor;
+
+                } else if (color === 2) {
+                    ctx.fillStyle = _sharkColor;
+
+                }
+                ctx.fillRect((_gridUnit * x), (_gridUnit * y), _gridUnit, _gridUnit);
+            };
+        } else {
+            document.getElementById("result").innerHTML = "Sorry! No Web Worker support.";
         }
     }
 
-    function drawSea() {
-        for (var i = 0; i < 100; i++) {
-            for (var y = 0; y < 100; y++) {
-                populateArea(y, i, sea[y][i]);
-            }
-        }
+    function stopWorker() {
+        w.terminate();
+        w = undefined;
     }
+    // //colors
+    // var _seaColor = "#80b3ff";
+    // var _fishColor = "#70db70";
+    // var _sharkColor = "#ff3333";
 
-    function populateArea(x, y, color) {
-        if (color === 0) {
-            ctx.fillStyle = _seaColor;
+    // var _sea = 0;
+    // var _fish = 1;
+    // var _shark = 2;
 
-        } else if (color === 1) {
-            ctx.fillStyle = _fishColor;
+    // //size
+    // var _gridUnit = 10;
+    // var canvas = document.getElementById("myCanvas");
+    // var ctx = canvas.getContext("2d");
 
-        } else if (color === 2) {
-            ctx.fillStyle = _sharkColor;
+    // var sea = [];
 
-        }
-        ctx.fillRect((_gridUnit * x), (_gridUnit * y), _gridUnit, _gridUnit);
-    }
 
-    sea[50][70] = _shark;
-    drawSea();
+
+    // // ctx.fillStyle = "#FF0000";
+    // // ctx.fillRect(0, 0, 150, 75);
+    // // ctx.fillStyle = "#000000";
+    // //ctx.fillRect(500, 500, 150, 150);
+    // initSea();
+    // // populateArea(50, 70, _fishColor);
+
+
+    // function initSea() {
+    //     for (var i = 0; i < 100; i++) {
+    //         var row = [];
+    //         for (var y = 0; y < 100; y++) {
+    //             row.push(_sea);
+
+    //             //populateArea(y, i, _seaColor);
+    //         }
+    //         sea.push(row);
+    //     }
+    // }
+
+    // function drawSea() {
+    //     for (var i = 0; i < 100; i++) {
+    //         for (var y = 0; y < 100; y++) {
+    //             populateArea(y, i, sea[y][i]);
+    //         }
+    //     }
+    // }
+
+    // function populateArea(x, y, color) {
+    //     if (color === 0) {
+    //         ctx.fillStyle = _seaColor;
+
+    //     } else if (color === 1) {
+    //         ctx.fillStyle = _fishColor;
+
+    //     } else if (color === 2) {
+    //         ctx.fillStyle = _sharkColor;
+
+    //     }
+    //     ctx.fillRect((_gridUnit * x), (_gridUnit * y), _gridUnit, _gridUnit);
+    // }
+
+    // sea[50][70] = _shark;
+    // drawSea();
+
+    // var seaManager = {
+
+    // }
 </script>
 
 </html>
